@@ -2,7 +2,8 @@
 
 using namespace std;
 
-Test::Test(ConcurrentDS* cds, float searchWeight, float insertWeight, float removeWeight, KeyGenerator* keygens, int threadCount)
+template<class T>
+Test<T>::Test(T* cds, float searchWeight, float insertWeight, float removeWeight, KeyGenerator* keygens, int threadCount)
 {
 	this->testSubjectPtr = cds;
 	this->searchWeight = searchWeight;
@@ -12,7 +13,8 @@ Test::Test(ConcurrentDS* cds, float searchWeight, float insertWeight, float remo
 	this->threadCount = threadCount;
 }
 
-void Test::Prepopulate(int count)
+template<class T>
+void Test<T>::Prepopulate(int count)
 {
 	int i;
 	for(i = 0; i < count; i++)
@@ -21,7 +23,8 @@ void Test::Prepopulate(int count)
 	}
 }
 
-void Test::Runner(int thread_no)
+template<class T>
+void Test<T>::Runner(int thread_no)
 {
 	//Pick Operation;
 	hash<thread::id> hasher;
@@ -41,7 +44,8 @@ void Test::Runner(int thread_no)
 	}
 }
 
-void Test::LoopRunner(int thread_no, int operationsPerThread)
+template<class T>
+void Test<T>::LoopRunner(int thread_no, int operationsPerThread)
 {
 	int i;
 	for(i = 0; i < operationsPerThread; i++)
@@ -50,7 +54,8 @@ void Test::LoopRunner(int thread_no, int operationsPerThread)
 	}
 }
 
-void Test::Run(int operationsPerThread)
+template<class T>
+void Test<T>::Run(int operationsPerThread)
 {
 	thread* threads = new thread[threadCount];
 	int i;

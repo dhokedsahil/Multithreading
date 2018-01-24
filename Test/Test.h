@@ -11,20 +11,21 @@ public:
 	virtual int remove(int key) =0;	
 };
 
+template<class T>
 class Test
 {
 public:
-	ConcurrentDS* testSubjectPtr;
+	T* testSubjectPtr;
 	float searchWeight;
 	float insertWeight; 
 	float removeWeight;
 	int threadCount;
 	KeyGenerator* keygens;//An array of key generators
-	Test(ConcurrentDS*, float searchWeight, float insertWeight, float removeWeight, KeyGenerator*, int threadCount);
+	Test(T*, float searchWeight, float insertWeight, float removeWeight, KeyGenerator*, int threadCount);
 	void Prepopulate(int count);
 	void Runner(int thread_no);
 	void LoopRunner(int thread_no, int operationsPerThread);
-	void Run();
+	void Run(int operationsPerThread);
 };
 
 #endif
