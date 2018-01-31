@@ -5,6 +5,8 @@
 
 using namespace std;
 
+uniformKeyGenerator::uniformKeyGenerator():uniformKeyGenerator(1,1000){}
+
 //TODO
 uniformKeyGenerator::uniformKeyGenerator(int min, int max)
 {
@@ -19,6 +21,8 @@ int uniformKeyGenerator::key()
 {
 	return dist(gen);
 }
+
+zipfKeyGenerator::zipfKeyGenerator():zipfKeyGenerator(1000){}
 
 //TODO
 zipfKeyGenerator::zipfKeyGenerator(int max)

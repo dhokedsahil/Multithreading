@@ -1,9 +1,11 @@
 #include "Test.h"
+#include "../Parallel Linked List/LinkedList.h"
+#include <iostream>
 
 using namespace std;
 
 template<class T>
-Test<T>::Test(T* cds, float searchWeight, float insertWeight, float removeWeight, KeyGenerator* keygens, int threadCount)
+Test<T>::Test(T* cds, float searchWeight, float insertWeight, float removeWeight, KeyGenerator** keygens, int threadCount)
 {
 	this->testSubjectPtr = cds;
 	this->searchWeight = searchWeight;
@@ -19,7 +21,7 @@ void Test<T>::Prepopulate(int count)
 	int i;
 	for(i = 0; i < count; i++)
 	{
-		testSubjectPtr->insert(keygens[0].key());
+		testSubjectPtr->insert(keygens[0]->key());
 	}
 }
 
@@ -27,14 +29,15 @@ template<class T>
 void Test<T>::Runner(int thread_no)
 {
 	//Pick Operation;
-	hash<thread::id> hasher;
-	thread_local static mt19937 gen(time(0) + hasher(this_thread::get_id()));
-	thread_local static discrete_distribution<int> dist{searchWeight, insertWeight, removeWeight};
+	static thread_local hash<thread::id> hasher;
+	static thread_local mt19937 gen(time(0) + hasher(this_thread::get_id()));
+	static thread_local discrete_distribution<int> dist{searchWeight, insertWeight, removeWeight};
 	int operation = dist(gen);
 	
 	//Generate Key
-	int key = keygens[thread_no].key();
+	int key = keygens[thread_no]->key();
 	
+	operationsCount[operation]++;
 	//Perform Operation
 	switch(operation)
 	{
@@ -57,14 +60,24 @@ void Test<T>::LoopRunner(int thread_no, int operationsPerThread)
 template<class T>
 void Test<T>::Run(int operationsPerThread)
 {
+	operationsCount[0] = 0;
+	operationsCount[1] = 0;
+	operationsCount[2] = 0;
+
 	thread* threads = new thread[threadCount];
 	int i;
 	for(i = 0; i < threadCount; i++)
 	{
-		threads[i] = thread(&Test::LoopRunner, this, i, operationsPerThread);
+		threads[i] = thread(&Test<T>::LoopRunner, this, i, operationsPerThread);
 	}
 	for(i = 0; i < threadCount; i++)
 	{
 		threads[i].join();
 	}
+
+	std::cout << "#search operations = " << operationsCount[0] << std::endl;
+	std::cout << "#insert operations = " << operationsCount[1] << std::endl;
+	std::cout << "#delete operations = " << operationsCount[2] << std::endl;
 }
+
+template class Test<ConcurrentLinkedList>;

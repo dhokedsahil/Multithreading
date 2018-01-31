@@ -132,12 +132,12 @@ Nodeptr ConcurrentLinkedList::remove(int key)
 
 void ConcurrentLinkedList::print()
 {
-	std::cout << "H" << " --> ";
+	std::cout << "\nH" << " --> ";
 	Nodeptr current = this->head.getNext();
 	while(current.getValue() < tail.getValue())
 	{
 		std::cout << current.getValue() << " --> ";
 		current = current.getNext();
 	}
-	std::cout << "T --> End" << std::endl;
+	std::cout << "T --> End\n" << std::endl;
 }
