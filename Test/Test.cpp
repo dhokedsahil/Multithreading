@@ -1,5 +1,5 @@
 #include "Test.h"
-#include "../Parallel Linked List/LinkedList.h"
+#include "../ParallelLinkedList/LinkedList.h"
 #include <iostream>
 
 using namespace std;
@@ -70,6 +70,7 @@ void Test<T>::Run(int operationsPerThread)
 	{
 		threads[i] = thread(&Test<T>::LoopRunner, this, i, operationsPerThread);
 	}
+
 	for(i = 0; i < threadCount; i++)
 	{
 		threads[i].join();

@@ -1,5 +1,6 @@
 CXX = g++
-CPPFLAGS = -std=c++11 -g
+CPPFLAGS = -std=c++11 -g -pthread
 
-Parallel\ Linked\ List/Tester: Parallel\ Linked\ List/LinkedList.o Parallel\ Linked\ List/Node.o Parallel\ Linked\ List/Nodeptr.o
+ParallelLinkedList/Tester: ParallelLinkedList/LinkedList.o ParallelLinkedList/Node.o ParallelLinkedList/Nodeptr.o Test/Test.o Keygeneration/KeyGenerator.o
 
+main: ParallelLinkedList/LinkedList.o ParallelLinkedList/Node.o ParallelLinkedList/Nodeptr.o

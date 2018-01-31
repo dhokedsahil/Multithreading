@@ -1,6 +1,6 @@
 #include "LinkedList.h"
 #include "../Test/Test.h"
-#include "../Key generation/KeyGenerator.h"
+#include "../Keygeneration/KeyGenerator.h"
 
 int main()
 {

@@ -1,7 +1,7 @@
 #ifndef SAHIL_TEST
 #define SAHIL_TEST
 
-#include "../Key generation/KeyGenerator.h"
+#include "../Keygeneration/KeyGenerator.h"
 #include <atomic>
 
 class ConcurrentDS
