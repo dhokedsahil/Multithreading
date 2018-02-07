@@ -5,7 +5,7 @@
 int main()
 {
     ConcurrentLinkedList cll;
-    int noThreads = 3;
+    int noThreads = 10;
     KeyGenerator** keygens = new KeyGenerator*[noThreads];
     for(int i = 0; i < noThreads; i++)
     {

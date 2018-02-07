@@ -1,6 +1,7 @@
 #include "Test.h"
 #include "../ParallelLinkedList/LinkedList.h"
 #include <iostream>
+#include <chrono>
 
 using namespace std;
 
@@ -60,12 +61,16 @@ void Test<T>::LoopRunner(int thread_no, int operationsPerThread)
 template<class T>
 void Test<T>::Run(int operationsPerThread)
 {
+	std::chrono::steady_clock::time_point start, end;
 	operationsCount[0] = 0;
 	operationsCount[1] = 0;
 	operationsCount[2] = 0;
 
 	thread* threads = new thread[threadCount];
 	int i;
+
+	start = std::chrono::steady_clock::now();
+	
 	for(i = 0; i < threadCount; i++)
 	{
 		threads[i] = thread(&Test<T>::LoopRunner, this, i, operationsPerThread);
@@ -75,10 +80,13 @@ void Test<T>::Run(int operationsPerThread)
 	{
 		threads[i].join();
 	}
+		
+	end = std::chrono::steady_clock::now();
 
 	std::cout << "#search operations = " << operationsCount[0] << std::endl;
 	std::cout << "#insert operations = " << operationsCount[1] << std::endl;
 	std::cout << "#delete operations = " << operationsCount[2] << std::endl;
+	std::cout << "Time taken = " << std::chrono::duration_cast<std::chrono::milliseconds>(end-start).count() << "ms" << std::endl;
 }
 
 template class Test<ConcurrentLinkedList>;
