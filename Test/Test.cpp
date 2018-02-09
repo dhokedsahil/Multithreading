@@ -61,10 +61,7 @@ void Test<T>::LoopRunner(int thread_no, int operationsPerThread)
 
 template<class T>
 void Test<T>::Run(int operationsPerThread)
-{
-	ofstream fout;
-	fout.open("results.csv", ios::out|ios::app);
-	
+{	
 	std::chrono::steady_clock::time_point start, end;
 	operationsCount[0] = 0;
 	operationsCount[1] = 0;
@@ -87,6 +84,8 @@ void Test<T>::Run(int operationsPerThread)
 		
 	end = std::chrono::steady_clock::now();
 
+	ofstream fout;
+	fout.open("results.csv", ios::out|ios::app);
 	fout << threadCount;
 	//fout << ',' << threadCount;
 	fout << ',' << operationsPerThread;
