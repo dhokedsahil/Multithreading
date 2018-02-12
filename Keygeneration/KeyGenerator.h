@@ -28,11 +28,12 @@ class zipfKeyGenerator : public KeyGenerator
 {
 	const int MAX_POSSIBLE = 1000;
 public:
+	int min;
 	int max;
 	mt19937 gen;
 	discrete_distribution<int> dist;
 	zipfKeyGenerator();
-	zipfKeyGenerator(int max);
+	zipfKeyGenerator(int min, int max);
 	int key();
 };
 
