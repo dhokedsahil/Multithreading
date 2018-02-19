@@ -65,8 +65,9 @@ pair<Nodeptr, Nodeptr> ConcurrentLinkedList::findAndFix(int v)
 	return make_pair(current, next);
 }
 
-Nodeptr ConcurrentLinkedList::search(int key)
+Nodeptr ConcurrentLinkedList::search(int key, bool &success)
 {
+	success = false;
 	if(this->head.getValue() == key || this->tail.getValue() == key)
 	{
 		//Cannot look for head or tail
@@ -76,13 +77,15 @@ Nodeptr ConcurrentLinkedList::search(int key)
 	pair<Nodeptr, Nodeptr> findResult = find(key);
 	if(findResult.second.getValue() == key && !findResult.second.isMarked())
 	{
+		success = true;
 		return findResult.second;
 	}
 	return Nodeptr((Node*)NULL);
 }
 
-Nodeptr ConcurrentLinkedList::insert(int key)
+Nodeptr ConcurrentLinkedList::insert(int key, bool &success)
 {
+	success = false;
 	if(this->head.getValue() == key || this->tail.getValue() == key)
 	{
 		//Cannot insert head or tail
@@ -96,17 +99,19 @@ Nodeptr ConcurrentLinkedList::insert(int key)
 		findResult = findAndFix(key);
 		if(findResult.second.getValue() == key)
 		{
-			//TODO: delete newNodePtr;
+			delete newNodePtr.pointer;
 			return Nodeptr((Node*)NULL);
 		}
 		//Insert between first and second
 		newNodePtr.setNext(findResult.second.getNode());
 	}while(!findResult.first.atomicSetNext(findResult.second, newNodePtr));
+	success = true;
 	return newNodePtr;
 }
 
-Nodeptr ConcurrentLinkedList::remove(int key)
+Nodeptr ConcurrentLinkedList::remove(int key, bool &success)
 {
+	success = false;
 	if(this->head.getValue() == key || this->tail.getValue() == key)
 	{
 		//Cannot remove head or tail
@@ -127,6 +132,7 @@ Nodeptr ConcurrentLinkedList::remove(int key)
 	findResult.first.atomicSetNext(findResult.second, findResult.second.getNextNode());
 	
 	//TODO: delete the findResult.second
+	success = true;
 	return findResult.second;
 }
 
@@ -140,4 +146,21 @@ void ConcurrentLinkedList::print()
 		current = current.getNext();
 	}
 	std::cout << "T --> End\n" << std::endl;
+}
+
+int ConcurrentLinkedList::size()
+{
+	int length = 0;
+	Nodeptr current = this->head.getNext();
+	while(current.getValue() < tail.getValue())
+	{
+		current = current.getNext();
+		length++;
+	}
+	return length;
+}
+
+void ConcurrentLinkedList::CleanUp()
+{
+	findAndFix(tail.getValue());
 }

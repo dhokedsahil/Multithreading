@@ -1,0 +1,6 @@
+threads = 15
+operations_per_thread = 1000000
+search_weight = 10
+insert_weight = 45
+delete_weight = 45
+prepopulate = 15

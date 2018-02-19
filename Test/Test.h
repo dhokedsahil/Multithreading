@@ -21,9 +21,11 @@ public:
 	float insertWeight; 
 	float removeWeight;
 	atomic<int> operationsCount[3];
+	atomic<int> operationsSuccessCount[3];
 	int threadCount;
 	KeyGenerator** keygens;//An array of key generators
 	Test(T*, float searchWeight, float insertWeight, float removeWeight, KeyGenerator**, int threadCount);
+	static void RunFromConfig(T*, string configFileName, KeyGenerator**);
 	void Prepopulate(int count);
 	void Runner(int thread_no);
 	void LoopRunner(int thread_no, int operationsPerThread);

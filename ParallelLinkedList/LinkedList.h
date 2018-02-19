@@ -11,10 +11,12 @@ public:
 	ConcurrentLinkedList();
 	std::pair<Nodeptr, Nodeptr> find(int v);
 	std::pair<Nodeptr, Nodeptr> findAndFix(int v);
-	Nodeptr search(int key);
-	Nodeptr insert(int key);
-	Nodeptr remove(int key);
+	Nodeptr search(int key, bool &success);
+	Nodeptr insert(int key, bool &success);
+	Nodeptr remove(int key, bool &success);
 	void print();
+	int size();
+	void CleanUp();
 };
 
 #endif
