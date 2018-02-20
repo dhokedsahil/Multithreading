@@ -17,6 +17,7 @@ public:
 	void print();
 	int size();
 	void CleanUp();
+	void removeAll();
 };
 
 #endif

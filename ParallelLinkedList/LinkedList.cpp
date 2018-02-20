@@ -160,7 +160,23 @@ int ConcurrentLinkedList::size()
 	return length;
 }
 
+//Removes all  marked nodes
 void ConcurrentLinkedList::CleanUp()
 {
 	findAndFix(tail.getValue());
+}
+
+//deletes all nodes
+//synchronous routine
+void ConcurrentLinkedList::removeAll()
+{
+	Nodeptr current = this->head.getNext();
+	Nodeptr next = current.getNext();
+	while(current.getValue() < tail.getValue())
+	{
+		delete current.pointer;
+		current = next;
+		next = current.getNext();
+	}
+	this->head.setNext(current.pointer);
 }

@@ -19,8 +19,9 @@ Test<T>::Test(T* cds, float searchWeight, float insertWeight, float removeWeight
 }
 
 template<class T>
-void Test<T>::RunFromConfig(T* cds, string configFileName, KeyGenerator** keygens)
-{
+void Test<T>::RunFromConfig(T* cds, string configFileName)
+{	
+	int i;
 	ifstream fin;
 	map<string, int> configs;
 	string config_name;
@@ -29,7 +30,7 @@ void Test<T>::RunFromConfig(T* cds, string configFileName, KeyGenerator** keygen
 	fin.open("config", ios::in);
 	while(fin)
 	{
-		cin >> config_name >> equals >> config_value;
+		fin >> config_name >> equals >> config_value;
 		if(equals == '=')
 		{
 			configs[config_name] = config_value;
@@ -37,9 +38,32 @@ void Test<T>::RunFromConfig(T* cds, string configFileName, KeyGenerator** keygen
 	}
 	fin.close();
 
-	Test<T> test(cds, configs["search_weight"], configs["insert_weight"], configs["remove_weight"], keygens, configs["threads"]);
-	test.Prepopulate(configs["prepopulate"]);
-	test.Run(configs["operations_per_thread"]);
+	int noThreads = configs["max_threads"];
+	KeyGenerator** keygens = new KeyGenerator*[noThreads];
+    for(i = 0; i < noThreads; i++)
+    {
+		if(configs["keyspace"] == 0)
+		{
+			keygens[i] = new uniformKeyGenerator(configs["min_key"], configs["max_key"]);
+		}
+		else if(configs["keyspace"] == 1)
+		{
+			keygens[i] = new zipfKeyGenerator(configs["min_key"], configs["max_key"]);
+		}
+    }
+
+	Test<T> test(cds, configs["search_weight"], configs["insert_weight"], configs["remove_weight"], keygens, configs["min_threads"]);
+
+	for(i = configs["min_threads"]; i <= configs["max_threads"]; i+= configs["thread_increment"])
+	{
+		test.Prepopulate(configs["prepopulate"]);
+		test.threadCount = i;
+		cout << "Beginning run for " << i << " threads" << endl;
+		test.Run(configs["operations_per_thread"]);
+		cout << "Finished run for " << i << " threads\n" << endl;
+		cds->removeAll();
+	}
+	
 }
 
 template<class T>
@@ -102,6 +126,10 @@ void Test<T>::Run(int operationsPerThread)
 	operationsCount[1] = 0;
 	operationsCount[2] = 0;
 
+	operationsSuccessCount[0] = 0;
+	operationsSuccessCount[1] = 0;
+	operationsSuccessCount[2] = 0;
+
 	int before_size = testSubjectPtr->size();
 	thread* threads = new thread[threadCount];
 	int i;
@@ -130,7 +158,7 @@ void Test<T>::Run(int operationsPerThread)
 	fout << ',' << operationsPerThread;
 	fout << ',' << time_ms.count();// in milliseconds
 	fout << ',' << threadCount * operationsPerThread;
-	fout << ',' << time_ms.count() * 1000 / operationsPerThread;//latency(time per operation) in microseconds
+	fout << ',' << time_ms.count() * 1000.0 / operationsPerThread;//latency(time per operation) in microseconds
 	fout << ',' << searchWeight;
 	fout << ',' << insertWeight;
 	fout << ',' << removeWeight;

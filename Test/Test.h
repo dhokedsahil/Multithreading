@@ -25,7 +25,7 @@ public:
 	int threadCount;
 	KeyGenerator** keygens;//An array of key generators
 	Test(T*, float searchWeight, float insertWeight, float removeWeight, KeyGenerator**, int threadCount);
-	static void RunFromConfig(T*, string configFileName, KeyGenerator**);
+	static void RunFromConfig(T*, string configFileName);
 	void Prepopulate(int count);
 	void Runner(int thread_no);
 	void LoopRunner(int thread_no, int operationsPerThread);

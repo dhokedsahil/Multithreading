@@ -1,6 +1,11 @@
-threads = 15
-operations_per_thread = 1000000
+min_threads = 5
+max_threads = 30
+thread_increment = 1
+operations_per_thread = 1000
 search_weight = 10
 insert_weight = 45
-delete_weight = 45
+remove_weight = 45
 prepopulate = 15
+keyspace = 0 unifrom = 0 zipf = 1
+min_key = 5
+max_key = 80

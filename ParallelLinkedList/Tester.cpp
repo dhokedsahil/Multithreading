@@ -5,17 +5,8 @@
 int main()
 {
     ConcurrentLinkedList cll;
-    int noThreads = 30;
-    KeyGenerator** keygens = new KeyGenerator*[noThreads];
-    for(int i = 0; i < noThreads; i++)
-    {
-        keygens[i] = new uniformKeyGenerator(5,80);
-    }
-    Test<ConcurrentLinkedList> test(&cll, 10.0, 45.0, 45.0, keygens, noThreads);
-    test.Prepopulate(30);
-    int i = cll.size();
-    cll.print();
-    test.Run(1000000);
-    cll.print();
+    
+    Test<ConcurrentLinkedList>::RunFromConfig(&cll, "config");
+    
     return 0;
 }
