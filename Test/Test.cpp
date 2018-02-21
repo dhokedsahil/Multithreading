@@ -44,11 +44,11 @@ void Test<T>::RunFromConfig(T* cds, string configFileName)
     {
 		if(configs["keyspace"] == 0)
 		{
-			keygens[i] = new uniformKeyGenerator(configs["min_key"], configs["max_key"]);
+			keygens[i] = new uniformKeyGenerator(configs["min_key"], configs["max_key"], i);
 		}
 		else if(configs["keyspace"] == 1)
 		{
-			keygens[i] = new zipfKeyGenerator(configs["min_key"], configs["max_key"]);
+			keygens[i] = new zipfKeyGenerator(configs["min_key"], configs["max_key"], i);
 		}
     }
 
@@ -148,6 +148,7 @@ void Test<T>::Run(int operationsPerThread)
 		
 	end = std::chrono::steady_clock::now();
 	std::chrono::milliseconds time_ms = chrono::duration_cast<std::chrono::milliseconds>(end-start);
+	double latency_ms = chrono::duration_cast<std::chrono::microseconds>(end-start).count() / (double)operationsPerThread;//latency(time per operation) in microseconds
 	testSubjectPtr->CleanUp();
 	int after_size = testSubjectPtr->size();
 
@@ -158,7 +159,8 @@ void Test<T>::Run(int operationsPerThread)
 	fout << ',' << operationsPerThread;
 	fout << ',' << time_ms.count();// in milliseconds
 	fout << ',' << threadCount * operationsPerThread;
-	fout << ',' << time_ms.count() * 1000.0 / operationsPerThread;//latency(time per operation) in microseconds
+	fout << ',' << threadCount * operationsPerThread/ (double)time_ms.count();//operations per second
+	fout << ',' << latency_ms;
 	fout << ',' << searchWeight;
 	fout << ',' << insertWeight;
 	fout << ',' << removeWeight;
@@ -170,6 +172,9 @@ void Test<T>::Run(int operationsPerThread)
 	fout << ',' << operationsSuccessCount[0];	//Successful Search count
 	fout << ',' << operationsSuccessCount[1];	//Successful Insert count
 	fout << ',' << operationsSuccessCount[2];	//Successful Remove count
+	fout << ',' << keygens[0]->min;
+	fout << ',' << keygens[0]->max;
+	fout << ',' << keygens[0]->distributionType();
 	fout << std::endl;
 	fout.close();
 }
