@@ -21,7 +21,7 @@ Test<T>::Test(T* cds, float searchWeight, float insertWeight, float removeWeight
 template<class T>
 void Test<T>::RunFromConfig(T* cds, string configFileName)
 {	
-	int i;
+	int i, j;
 	ifstream fin;
 	map<string, int> configs;
 	string config_name;
@@ -56,12 +56,15 @@ void Test<T>::RunFromConfig(T* cds, string configFileName)
 
 	for(i = configs["min_threads"]; i <= configs["max_threads"]; i+= configs["thread_increment"])
 	{
-		test.Prepopulate(configs["prepopulate"]);
-		test.threadCount = i;
-		cout << "Beginning run for " << i << " threads" << endl;
-		test.Run(configs["operations_per_thread"]);
-		cout << "Finished run for " << i << " threads\n" << endl;
-		cds->removeAll();
+		for(j= configs["operations_per_thread_min"]; j <= configs["operations_per_thread_max"]; j*= configs["operations_per_thread_increment_factor"])
+		{
+			test.Prepopulate(configs["prepopulate"]);
+			test.threadCount = i;
+			cout << "Beginning run for " << i << " threads with " << j << " operations per thread" << endl;
+			test.Run(j);
+			cout << "Finished run for " << i << " threads with " << j << " operations per thread\n" << endl;
+			cds->removeAll();
+		}
 	}
 	
 }
