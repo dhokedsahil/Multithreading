@@ -3,6 +3,7 @@
 
 #include "../Keygeneration/KeyGenerator.h"
 #include <atomic>
+#include <map>
 
 class ConcurrentDS
 {
@@ -25,7 +26,8 @@ public:
 	int threadCount;
 	KeyGenerator** keygens;//An array of key generators
 	Test(T*, float searchWeight, float insertWeight, float removeWeight, KeyGenerator**, int threadCount);
-	static void RunFromConfig(T*, string configFileName);
+	static map<string, int> getConfigs(string configFile);
+	static void Run(T*, map<string, int> configs);
 	void Prepopulate(int count);
 	void Runner(int thread_no);
 	void LoopRunner(int thread_no, int operationsPerThread);

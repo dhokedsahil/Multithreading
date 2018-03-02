@@ -1,9 +1,5 @@
-min_threads = 10
-max_threads = 100
-thread_increment = 10
-operations_per_thread_min = 10000
-operations_per_thread_max = 1000000
-operations_per_thread_increment_factor = 5
+threads = 30
+operations_per_thread = 2000000
 search_weight = 10
 insert_weight = 45
 remove_weight = 45

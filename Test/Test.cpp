@@ -4,6 +4,10 @@
 #include <chrono>
 #include <fstream>
 #include <map>
+#include <ctime>
+#include <iomanip>
+#include <unistd.h>
+#include <limits.h>
 
 using namespace std;
 
@@ -19,14 +23,15 @@ Test<T>::Test(T* cds, float searchWeight, float insertWeight, float removeWeight
 }
 
 template<class T>
-void Test<T>::RunFromConfig(T* cds, string configFileName)
-{	
-	int i, j;
-	ifstream fin;
+map<string, int> Test<T>::getConfigs(string configFile)
+{
 	map<string, int> configs;
+	ifstream fin;
+
 	string config_name;
 	char equals;
 	int config_value;
+	
 	fin.open("config", ios::in);
 	while(fin)
 	{
@@ -37,8 +42,15 @@ void Test<T>::RunFromConfig(T* cds, string configFileName)
 		}
 	}
 	fin.close();
+	return configs;
+}
 
-	int noThreads = configs["max_threads"];
+template<class T>
+void Test<T>::Run(T* cds, map<string, int> configs)
+{	
+	int i, j;
+	
+	int noThreads = configs["threads"];
 	KeyGenerator** keygens = new KeyGenerator*[noThreads];
     for(i = 0; i < noThreads; i++)
     {
@@ -52,21 +64,14 @@ void Test<T>::RunFromConfig(T* cds, string configFileName)
 		}
     }
 
-	Test<T> test(cds, configs["search_weight"], configs["insert_weight"], configs["remove_weight"], keygens, configs["min_threads"]);
+	Test<T> test(cds, configs["search_weight"], configs["insert_weight"], configs["remove_weight"], keygens, configs["threads"]);
 
-	for(i = configs["min_threads"]; i <= configs["max_threads"]; i+= configs["thread_increment"])
-	{
-		for(j= configs["operations_per_thread_min"]; j <= configs["operations_per_thread_max"]; j*= configs["operations_per_thread_increment_factor"])
-		{
-			test.Prepopulate(configs["prepopulate"]);
-			test.threadCount = i;
-			cout << "Beginning run for " << i << " threads with " << j << " operations per thread" << endl;
-			test.Run(j);
-			cout << "Finished run for " << i << " threads with " << j << " operations per thread\n" << endl;
-			cds->removeAll();
-		}
-	}
-	
+	test.Prepopulate(configs["prepopulate"]);
+	test.threadCount = noThreads;
+	cout << "Beginning run for " << noThreads  << " threads with " << configs["operations_per_thread"]  << " operations per thread" << endl;
+	test.Run(configs["operations_per_thread"]);
+	cout << "Finished run for " << noThreads << " threads with " << configs["operations_per_thread"] << " operations per thread\n" << endl;
+	cds->removeAll();
 }
 
 template<class T>
@@ -148,17 +153,23 @@ void Test<T>::Run(int operationsPerThread)
 	{
 		threads[i].join();
 	}
-		
+			
 	end = std::chrono::steady_clock::now();
 	std::chrono::milliseconds time_ms = chrono::duration_cast<std::chrono::milliseconds>(end-start);
 	double latency_ms = chrono::duration_cast<std::chrono::microseconds>(end-start).count() / (double)operationsPerThread;//latency(time per operation) in microseconds
 	testSubjectPtr->CleanUp();
 	int after_size = testSubjectPtr->size();
 
+	auto current = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
 	ofstream fout;
 	fout.open("results.csv", ios::out|ios::app);
-	fout << threadCount;
-	//fout << ',' << threadCount;
+	
+	char hostname[HOST_NAME_MAX];
+	gethostname(hostname, HOST_NAME_MAX);
+
+	fout << hostname;
+	fout << ',' << std::put_time(std::localtime(&current), "%F %T");
+	fout << ',' << threadCount;
 	fout << ',' << operationsPerThread;
 	fout << ',' << time_ms.count();// in milliseconds
 	fout << ',' << threadCount * operationsPerThread;
@@ -180,6 +191,8 @@ void Test<T>::Run(int operationsPerThread)
 	fout << ',' << keygens[0]->distributionType();
 	fout << std::endl;
 	fout.close();
+
+	delete [] threads;
 }
 
 template class Test<ConcurrentLinkedList>;
