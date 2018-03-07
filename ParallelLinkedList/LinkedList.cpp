@@ -20,7 +20,11 @@ pair<Nodeptr, Nodeptr> ConcurrentLinkedList::find(int v)
 	while(next.getValue() < v)
 	{
 		current = next;
-		next = current.getNext();
+		next = current.getNext();//the succeeding while loop is to ensure this command is succesful
+		while(next.pointer != current.getNext().pointer)
+		{
+			next = current.getNext();
+		}
 	}
 	return make_pair(current, next);
 }
